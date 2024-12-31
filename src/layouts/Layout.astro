@@ -1,0 +1,66 @@
+---
+import MobileMenu from '../components/MobileMenu.astro';
+
+interface Props {
+	title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" class="dark">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="description" content="Explore Denton's vibrant drinking culture - bars, breweries, and more!" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title} | Denton Drinks</title>
+	</head>
+	<body class="bg-dark-bg text-gray-100 min-h-screen">
+		<header class="bg-dark-surface border-b border-dark-border">
+			<nav class="max-w-6xl mx-auto px-4 py-6">
+				<div class="flex justify-between items-center">
+					<a href="/" class="text-2xl font-bold text-primary-light">Denton Drinks</a>
+					<ul class="hidden lg:flex space-x-6">
+						<li><a href="/bars" class="hover:text-primary-light transition-colors">Bars</a></li>
+						<li><a href="/breweries" class="hover:text-primary-light transition-colors">Breweries</a></li>
+						<li><a href="/reviews" class="hover:text-primary-light transition-colors">Latest Reviews</a></li>
+						<li><a href="/contact" class="hover:text-primary-light transition-colors">Contact</a></li>
+					</ul>
+					<MobileMenu />
+				</div>
+			</nav>
+		</header>
+		<main>
+			<slot />
+		</main>
+		<footer class="bg-dark-surface border-t border-dark-border mt-12 py-8">
+			<div class="max-w-6xl mx-auto px-4">
+				<p class="text-center text-secondary">© {new Date().getFullYear()} Denton Drinks. Drink responsibly.</p>
+			</div>
+		</footer>
+	</body>
+</html>
+<style is:global>
+	:root {
+		--accent: 133, 9, 40;
+		--accent-light: 166, 16, 51;
+		--accent-dark: 107, 7, 31;
+		--accent-gradient: linear-gradient(
+			45deg,
+			rgb(var(--accent)),
+			rgb(var(--accent-light)) 30%,
+			rgb(var(--accent-dark)) 60%
+		);
+	}
+	html {
+		font-family: system-ui, sans-serif;
+	}
+	main {
+		max-width: 6xl;
+		margin: 0 auto;
+		padding: 1rem;
+	}
+</style>

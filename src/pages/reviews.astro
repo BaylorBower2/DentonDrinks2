@@ -1,0 +1,54 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ReviewList from '../components/ReviewList.astro';
+import { getLatestReviews } from '../lib/reviews/review-service';
+import type { ReviewWithVenue } from '../lib/types';
+
+const page = parseInt(Astro.url.searchParams.get('page') || '1');
+let reviews: ReviewWithVenue[] = [];
+let hasMore = false;
+let error: string | null = null;
+
+try {
+  const result = await getLatestReviews(page);
+  reviews = result.reviews;
+  hasMore = result.hasMore;
+} catch (e) {
+  console.error('Error loading reviews:', e);
+  error = e instanceof Error ? e.message : 'Failed to load reviews';
+}
+
+const showSuccess = Astro.url.searchParams.get('success') === 'true';
+---
+
+<Layout title="Latest Reviews">
+  <div class="max-w-4xl mx-auto px-4 py-8">
+    {showSuccess && (
+      <div class="bg-secondary-light/10 border border-secondary text-secondary-dark px-4 py-3 rounded relative mb-8" role="alert">
+        <strong class="font-bold">Success!</strong>
+        <span class="block sm:inline"> Your review has been submitted successfully.</span>
+      </div>
+    )}
+
+    <h1 class="text-4xl font-bold text-center mb-8 text-primary">Latest Reviews</h1>
+    
+    {error && (
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-8" role="alert">
+        <strong class="font-bold">Error:</strong>
+        <span class="block sm:inline"> {error}</span>
+      </div>
+    )}
+
+    {reviews.length > 0 ? (
+      <ReviewList 
+        reviews={reviews}
+        hasMore={hasMore}
+        currentPage={page}
+      />
+    ) : !error && (
+      <div class="text-center text-gray-600">
+        <p>No reviews yet. Be the first to share your experience!</p>
+      </div>
+    )}
+  </div>
+</Layout>

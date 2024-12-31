@@ -1,0 +1,27 @@
+---
+import RatingStars from '../RatingStars.astro';
+
+interface Props {
+  name: string;
+  description: string;
+  type: 'bar' | 'brewery';
+  rating: number;
+  address: string;
+}
+
+const { name, description, type, rating, address } = Astro.props;
+---
+
+<div class="p-6">
+  <div class="flex justify-between items-start">
+    <h3 class="text-xl font-bold text-gray-100">{name}</h3>
+    <span class="bg-primary-dark/20 text-primary-light text-xs px-2 py-1 rounded-full">
+      {type}
+    </span>
+  </div>
+  <p class="text-gray-400 mt-2 line-clamp-2">{description}</p>
+  <div class="mt-4">
+    <RatingStars rating={rating} />
+  </div>
+  <p class="text-gray-500 text-sm mt-4">{address}</p>
+</div>

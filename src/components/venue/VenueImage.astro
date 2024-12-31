@@ -1,0 +1,19 @@
+---
+interface Props {
+  src: string;
+  alt: string;
+}
+
+const { src, alt } = Astro.props;
+---
+
+<div class="relative w-full">
+  <div class="aspect-[16/9] overflow-hidden rounded-t-lg">
+    <img
+      src={src}
+      alt={alt}
+      class="w-full h-full object-contain bg-dark-surface"
+      loading="lazy"
+    />
+  </div>
+</div>

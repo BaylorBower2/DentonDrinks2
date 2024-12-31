@@ -1,0 +1,25 @@
+---
+import VenueCard from './VenueCard.astro';
+import type { Venue } from '../lib/database.types';
+
+interface Props {
+  venues: Array<Venue & { rating: number; image: string }>;
+}
+
+const { venues } = Astro.props;
+---
+
+<section class="py-12 bg-gradient-to-b from-purple-50 to-white">
+  <div class="max-w-6xl mx-auto px-4">
+    <h2 class="text-3xl font-bold text-center mb-4">Top Rated Spots</h2>
+    <p class="text-gray-600 text-center mb-8">Highest rated venues according to our community</p>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {venues.map((venue) => (
+        <a href={`/${venue.type}s/${venue.id}`}>
+          <VenueCard {...venue} />
+        </a>
+      ))}
+    </div>
+  </div>
+</section>

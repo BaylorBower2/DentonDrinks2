@@ -1,0 +1,61 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import VenueDetails from '../../components/VenueDetails.astro';
+import ReviewSection from '../../components/ReviewSection.astro';
+import ReviewForm from '../../components/ReviewForm.astro';
+import ImageCarousel from '../../components/ImageCarousel.astro';
+import { getVenueById } from '../../lib/venues/venue-service';
+
+const { id } = Astro.params;
+
+if (!id) {
+  return Astro.redirect('/404');
+}
+
+let venue;
+let error;
+
+try {
+  venue = await getVenueById(id);
+} catch (e) {
+  console.error('Error loading venue:', e);
+  error = e instanceof Error ? e.message : 'Failed to load venue';
+}
+
+if (!venue && !error) {
+  return Astro.redirect('/404');
+}
+
+// Get all images from venue and reviews
+const allImages = venue ? [
+  venue.image,
+  ...venue.reviews
+    .map(review => review.image_url)
+    .filter(Boolean)
+] as string[] : [];
+---
+
+<Layout title={venue?.name || 'Venue Not Found'}>
+  <article class="max-w-4xl mx-auto px-4 py-8">
+    {error ? (
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+        <strong class="font-bold">Error:</strong>
+        <span class="block sm:inline"> {error}</span>
+      </div>
+    ) : venue && (
+      <>
+        <VenueDetails venue={venue} />
+        
+        {allImages.length > 0 && (
+          <div class="mt-8">
+            <h2 class="text-2xl font-bold mb-4 text-primary-light">Photo Gallery</h2>
+            <ImageCarousel images={allImages} venueName={venue.name} />
+          </div>
+        )}
+        
+        <ReviewSection reviews={venue.reviews} />
+        <ReviewForm venueId={venue.id} />
+      </>
+    )}
+  </article>
+</Layout>

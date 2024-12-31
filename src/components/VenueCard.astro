@@ -1,0 +1,26 @@
+---
+import VenueImage from './venue/VenueImage.astro';
+import VenueInfo from './venue/VenueInfo.astro';
+
+interface Props {
+  name: string;
+  description: string;
+  image: string;
+  address: string;
+  type: 'bar' | 'brewery';
+  rating: number;
+}
+
+const { name, description, image, address, type, rating } = Astro.props;
+---
+
+<div class="bg-dark-card rounded-lg shadow-lg overflow-hidden border border-dark-border hover:border-primary-light transition-colors h-full flex flex-col">
+  <VenueImage src={image} alt={name} />
+  <VenueInfo
+    name={name}
+    description={description}
+    type={type}
+    rating={rating}
+    address={address}
+  />
+</div>

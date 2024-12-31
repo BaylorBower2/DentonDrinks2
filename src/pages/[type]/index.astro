@@ -1,0 +1,80 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import VenueCard from '../../components/VenueCard.astro';
+import SearchBar from '../../components/SearchBar.astro';
+import { getVenues } from '../../lib/venues/venue-service';
+
+const { type } = Astro.params;
+
+// Validate type parameter
+if (type !== 'bars' && type !== 'breweries') {
+  return Astro.redirect('/404');
+}
+
+const searchQuery = Astro.url.searchParams.get('search') || '';
+
+let venues = [];
+let error = null;
+let debugInfo = null;
+
+try {
+  console.log('Fetching venues for type:', type);
+  venues = await getVenues(type === 'bars' ? 'bar' : 'brewery');
+  console.log('Fetched venues:', venues.length);
+  
+  // Add debug info in development
+  if (import.meta.env.DEV) {
+    debugInfo = {
+      supabaseUrl: import.meta.env.PUBLIC_SUPABASE_URL,
+      hasAnonKey: !!import.meta.env.PUBLIC_SUPABASE_ANON_KEY,
+      venuesCount: venues.length,
+      type: type
+    };
+  }
+} catch (e) {
+  console.error('Error loading venues:', e);
+  error = e instanceof Error ? e.message : 'Failed to load venues';
+}
+
+const filteredVenues = venues.filter(venue => 
+  venue.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  venue.description.toLowerCase().includes(searchQuery.toLowerCase())
+);
+
+const title = type === 'bars' ? 'Bars in Denton' : 'Breweries in Denton';
+---
+
+<Layout title={title}>
+  <div class="max-w-6xl mx-auto px-4 py-8">
+    <h1 class="text-4xl font-bold text-center mb-8 text-primary">{title}</h1>
+    
+    {error && (
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-8" role="alert">
+        <strong class="font-bold">Error:</strong>
+        <span class="block sm:inline"> {error}</span>
+      </div>
+    )}
+
+    {debugInfo && (
+      <div class="bg-gray-800 text-gray-200 p-4 rounded-lg mb-8 text-sm">
+        <pre>{JSON.stringify(debugInfo, null, 2)}</pre>
+      </div>
+    )}
+
+    <SearchBar />
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {filteredVenues.map((venue) => (
+        <a href={`/${type}/${venue.id}`}>
+          <VenueCard {...venue} />
+        </a>
+      ))}
+    </div>
+
+    {filteredVenues.length === 0 && !error && (
+      <div class="text-center text-gray-600 mt-8">
+        <p>No venues found matching your search.</p>
+      </div>
+    )}
+  </div>
+</Layout>

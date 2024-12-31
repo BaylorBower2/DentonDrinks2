@@ -1,0 +1,36 @@
+---
+import ReviewCard from './ReviewCard.astro';
+import type { ReviewWithVenue } from '../lib/types';
+
+interface Props {
+  reviews: ReviewWithVenue[];
+  hasMore: boolean;
+  currentPage: number;
+}
+
+const { reviews, hasMore, currentPage } = Astro.props;
+---
+
+<div class="space-y-6">
+  {reviews.map((review) => (
+    <ReviewCard
+      rating={review.rating}
+      comment={review.comment}
+      imageUrl={review.image_url}
+      venueName={review.venues.name}
+      venueType={review.venues.type}
+      createdAt={review.created_at}
+    />
+  ))}
+  
+  {hasMore && (
+    <div class="flex justify-center mt-8">
+      <a
+        href={`/reviews?page=${currentPage + 1}`}
+        class="bg-primary text-white px-6 py-2 rounded-md hover:bg-primary-light transition-colors"
+      >
+        Load More Reviews
+      </a>
+    </div>
+  )}
+</div>

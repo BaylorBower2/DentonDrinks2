@@ -1,0 +1,117 @@
+---
+interface Props {
+  images: string[];
+  venueName: string;
+}
+
+const { images, venueName } = Astro.props;
+---
+
+<div class="image-carousel">
+  <div id="gallery" class="hidden fixed inset-0 bg-black/90 z-50 flex items-center justify-center">
+    <button id="closeGallery" class="absolute top-4 right-4 text-white hover:text-gray-300">
+      <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+    
+    <button id="prevImage" class="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:text-gray-300">
+      <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+      </svg>
+    </button>
+
+    <div id="galleryImage" class="max-w-4xl max-h-[80vh] px-4">
+      <img src="" alt={venueName} class="max-w-full max-h-[80vh] object-contain" />
+    </div>
+
+    <button id="nextImage" class="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:text-gray-300">
+      <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+      </svg>
+    </button>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    {images.map((image, index) => (
+      <button 
+        class="gallery-image relative aspect-square overflow-hidden rounded-lg border border-dark-border hover:border-primary-light transition-colors"
+        data-index={index}
+      >
+        <img
+          src={image}
+          alt={`${venueName} photo ${index + 1}`}
+          class="absolute inset-0 w-full h-full object-cover cursor-pointer"
+        />
+      </button>
+    ))}
+  </div>
+</div>
+
+<script>
+  let currentIndex = 0;
+  const images = document.querySelectorAll('.gallery-image');
+  const gallery = document.getElementById('gallery');
+  const galleryImg = gallery?.querySelector('img');
+  const closeBtn = document.getElementById('closeGallery');
+  const prevBtn = document.getElementById('prevImage');
+  const nextBtn = document.getElementById('nextImage');
+
+  function showImage(index: number) {
+    if (!galleryImg) return;
+    const button = images[index] as HTMLButtonElement;
+    const img = button.querySelector('img');
+    if (!img) return;
+    
+    currentIndex = index;
+    galleryImg.src = img.src;
+    galleryImg.alt = img.alt;
+  }
+
+  function closeGallery() {
+    gallery?.classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+
+  function showPrevImage() {
+    const newIndex = currentIndex - 1 < 0 ? images.length - 1 : currentIndex - 1;
+    showImage(newIndex);
+  }
+
+  function showNextImage() {
+    const newIndex = currentIndex + 1 >= images.length ? 0 : currentIndex + 1;
+    showImage(newIndex);
+  }
+
+  // Event Listeners
+  images.forEach((image) => {
+    image.addEventListener('click', () => {
+      if (!gallery) return;
+      const index = parseInt(image.getAttribute('data-index') || '0');
+      gallery.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      showImage(index);
+    });
+  });
+
+  closeBtn?.addEventListener('click', closeGallery);
+  prevBtn?.addEventListener('click', showPrevImage);
+  nextBtn?.addEventListener('click', showNextImage);
+
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    if (gallery?.classList.contains('hidden')) return;
+    
+    switch (e.key) {
+      case 'Escape':
+        closeGallery();
+        break;
+      case 'ArrowLeft':
+        showPrevImage();
+        break;
+      case 'ArrowRight':
+        showNextImage();
+        break;
+    }
+  });
+</script>

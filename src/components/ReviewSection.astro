@@ -1,0 +1,41 @@
+---
+import RatingStars from './RatingStars.astro';
+import type { Review } from '../lib/types';
+
+interface Props {
+  reviews: Review[];
+}
+
+const { reviews } = Astro.props;
+
+const sortedReviews = [...reviews].sort((a, b) => 
+  new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+);
+---
+
+<div class="mt-8">
+  <h2 class="text-2xl font-bold mb-4 text-primary">Reviews</h2>
+  
+  {sortedReviews.length > 0 ? (
+    <div class="space-y-6">
+      {sortedReviews.map((review) => (
+        <div class="bg-gray-50 p-4 rounded-lg">
+          <RatingStars rating={review.rating} />
+          <p class="text-gray-700 mt-2">{review.comment}</p>
+          {review.image_url && (
+            <img 
+              src={review.image_url} 
+              alt="Review photo" 
+              class="mt-4 rounded-lg max-h-48 object-cover"
+            />
+          )}
+          <p class="text-gray-500 text-sm mt-2">
+            {new Date(review.created_at).toLocaleDateString()}
+          </p>
+        </div>
+      ))}
+    </div>
+  ) : (
+    <p class="text-gray-500">No reviews yet. Be the first to review!</p>
+  )}
+</div>

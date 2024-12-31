@@ -1,0 +1,28 @@
+---
+interface Props {
+  images: string[];
+  venueName: string;
+}
+
+const { images, venueName } = Astro.props;
+
+// Filter out null/undefined values and empty strings
+const validImages = images.filter(Boolean);
+---
+
+{validImages.length > 0 && (
+  <div class="mt-8">
+    <h2 class="text-2xl font-bold mb-4 text-primary">Photo Gallery</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {validImages.map((image) => (
+        <div class="relative aspect-square">
+          <img
+            src={image}
+            alt={`Photo from ${venueName}`}
+            class="absolute inset-0 w-full h-full object-cover rounded-lg shadow-md"
+          />
+        </div>
+      ))}
+    </div>
+  </div>
+)}

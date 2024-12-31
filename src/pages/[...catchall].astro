@@ -1,0 +1,27 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getVenueById } from '../lib/venues/venue-service';
+
+// Get the full path
+const path = Astro.url.pathname;
+
+// Try to parse the path for venue pages
+const venueMatch = path.match(/^\/(bars|breweries)\/([^\/]+)/);
+
+let content;
+
+if (venueMatch) {
+  const [, type, id] = venueMatch;
+  try {
+    const venue = await getVenueById(id);
+    if (venue) {
+      return Astro.redirect(`/${type}/${id}`);
+    }
+  } catch (error) {
+    console.error('Error fetching venue:', error);
+  }
+}
+
+// Default to home page redirect
+return Astro.redirect('/');
+---
